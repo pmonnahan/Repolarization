@@ -21,9 +21,8 @@ args = parser.parse_args()
 #if os.path.exists('/repolarization_lookup/') == False: #Create folder for output if it doesn't already exist
  #   os.mkdir('/repolarization_lookup/')
 
-  #  if args.gz == 'true' and args.v[-3:] == '.gz':
-        #gunzip args.v
-        # PATRICK: help w/ above mini section: Not sure if I need to make this dir; also the "gunzip args.v" gave a SyntaxError 
+if args.gz == 'true' and args.v[-3:] == '.gz':
+    gzip.gunzip(args.v)
 
 # PATRICK: I need help below
    # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
