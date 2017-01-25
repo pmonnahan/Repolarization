@@ -74,6 +74,7 @@ with open(args.v) as vcf:
             for ind in cols[9:]:
                 ind = ind.split(":")
                 dp = ind[2]  # PATRICK: I stopped debugging for the day bc I can't figure this out: it says line 76 is 'ListIndex out of range' even though the input vcf has this index.
+                print dp
                 gt = ind[0]
                 gt = gt.split("/")
 
