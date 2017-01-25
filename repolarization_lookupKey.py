@@ -28,7 +28,7 @@ args = parser.parse_args()
 # PATRICK: I need help below
    # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
 lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
-# is the above line necessary, or is that redundant due to line 36 opening args.v as 'vcf' ?
+# is the above line necessary, or is that redundant due to line 38 opening args.v as 'vcf' ?
 
  #   else:
   #      print 'error'
@@ -47,7 +47,7 @@ with open(args.v) as vcf:
             # for i in range(len(cols)):
             #     print(i,cols[i])         # printing the header name & its index position. Won't keep in final code; just to help build it
             
-            # PATRICK: I'm overthinking this; is it lookup_table_file.write or one of the next two options?
+            # PATRICK: I'm overthinking this; should I do lookup_table_file.write or one of the next two options?
             lookup_table_file.write(line)
             # vcf.write(line)
             # newVCF.write(line)
