@@ -76,7 +76,6 @@ with open(args.v) as vcf:
                 gt = ind[0]
                 gt = gt.split("/")
 
-
 # below is the 'Lyrata Only' section.
                 if args.ly == 'true':
                     if j == 2 or j == 3:
