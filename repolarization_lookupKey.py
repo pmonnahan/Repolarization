@@ -23,16 +23,12 @@ args = parser.parse_args()
 
 if args.gz == 'true' and args.v[-3:] == '.gz':
     gzip.gunzip(args.v)
-
+    lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 # I need help below
    # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
-lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
+else:
+    lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 # is the above line necessary, or is that redundant due to line 38 opening args.v as 'vcf' ?
-
- #   else:
-  #      print 'error'
-
-count = 0
 
 with open(args.v) as vcf:
     for line_idx, line in enumerate(vcf): #Cycle over lines in the VCF file
@@ -81,12 +77,15 @@ with open(args.v) as vcf:
 # below is the 'Lyrata Only' section.
 
                 if args.ly == 'true':
-                    if gt[0] != ".":
-                        num_ind += 1
-                        if sum([int(x) for x in gt]) == 2:
-                            alt_ind += 1
-                            if gt == '1/1':
-                                print 'blah2'
+                    for j in enumerate(names):
+                        if gt[0] != ".":
+                            num_ind += 1
+                            if sum([int(x) for x in gt]) == 2:
+                                alt_ind += 1
+                                if gt == '1/1':
+                                    print 'blah2'
+                                else:
+
                                 #add code to save the info/write to file
 # above section needs work; need to think more.
 
