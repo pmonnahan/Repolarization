@@ -24,21 +24,18 @@ args = parser.parse_args()
 if args.gz == 'true' and args.v[-3:] == '.gz':
     gzip.gunzip(args.v)
     lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
-# I need help below
-   # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
 
 lookup_table_file = open(args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 
-
-if args.ly == 'true':  # PJM: if we are only using lyrata, then we need to make sure that args.mi = 2, since there are only two lyrata samples.
-    args.mi = 2
+if args.ly == 'true':  
+    args.mi = 2 # args.mi must = 2, since there are only two lyrata samples
     args.mp = 1.0
 
 count = 0
 
 with open(args.v) as vcf:
-    for line_idx, line in enumerate(vcf): #Cycle over lines in the VCF file
-        cols = line.replace('\n', '').split('\t')  #Split each line of vcf
+    for line_idx, line in enumerate(vcf): # Cycle over lines in the VCF file
+        cols = line.replace('\n', '').split('\t')  # Split each line of vcf
         if len(cols) < 2:               ## This should be info just before header
             pass
         elif cols[0] == "#CHROM": #This should be header
@@ -46,13 +43,13 @@ with open(args.v) as vcf:
             # for i in range(len(cols)):
             #     print(i,cols[i])         # printing the header name & its index position. Won't keep in final code; just to help build it
             
-            names = [] #list to append pop names to (may not be necessary..)
-            for j in cols[9:]: #get names of individuals in vcf
+            names = [] # list to append pop names to (may not be necessary..)
+            for j in cols[9:]: # get names of individuals in vcf
                 names.append(j)
 
         else: 
             #if line_num < 10:             # trouble shooting; look at first 10 lines of code. remove later. make it larger to start.
-            scaff = cols[0]               #parse important info from each line     
+            scaff = cols[0]               # parse important info from each line     
             position = int(cols[1])
             ref_base = cols[3]
             alt_base = cols[4]      # parsing all these things
@@ -67,26 +64,26 @@ with open(args.v) as vcf:
 
             for j, ind in enumerate(cols[9:]):
                 ind = ind.split(":")
-                dp = ind[2]  # Help- this now prints out dp (correct; I compared to vcf) but breaks after a while and says 'listindex out of range'
-                print dp  # for debugging purposes you should put the print statements before the above two lines.  For example, if dp = ind[2] is breaking then you want to print ind before the call of dp = ind[2].  This will show you what ind is just prior to the error being thrown.
-                print ind
+                #print ind
+                #if ind[2] == True: # this line was me trying to be hacky. 
+                try:                  
+                    dp = ind[2]  # breaks after a while and says 'listindex out of range'
+                except IndexError:
+                    pass    # this little block overcomes the listindex error, but is it leaving out something important? 
+
+                #print dp  
+
                 gt = ind[0]
                 gt = gt.split("/")
 
+
 # below is the 'Lyrata Only' section.
-                # PJM: Your code below does not currently distinguish lyrata from the other samples.  You can use enumerate to do this as follows:
-                # PJM: If you look at the samples in the VCF, you should see that the first two samples are Croatica corresponding to j = 0 and j = 1
-                # PJM: Lyrata are the third and fourth samples and these will correspond to j = 2 and j = 3.
                 if args.ly == 'true':
                     if j == 2 or j == 3:
                         if gt[0] != ".":
                             num_ind += 1
                             if sum([int(x) for x in gt]) == 2:
                                 alt_ind += 1
-
-
-                                #add code to save the info/write to file
-# above section needs work; need to think more.
 
                 elif args.ly != 'true':
                     if gt[0] != ".":
@@ -95,6 +92,6 @@ with open(args.v) as vcf:
                             alt_ind += 1
 
             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
-                #out.write(scaff + "\t" + str(position) + "\n")
-                lookup_table_file.write(scaff + "\t" + str(position) + "\n")
-                # Help- is above line correct, or should it be vcf.write(.....)
+#original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
+                lookup_table_file.write(scaff + "HI" + "\t" + str(position) + str(ind) + "\n") # JMK Help: I can't seem to alter what's written to the file
+
