@@ -12,7 +12,7 @@ parser.add_argument('-v', type = str, metavar = 'vcf_path', required = True, hel
 parser.add_argument('-gz', type = str, metavar = 'gzipped?', required = False, default = 'false', help = 'are vcfs gzipped (true) or not (false)')
 parser.add_argument('-o', type = str, metavar = 'Output_Prefix', required = True, help = 'Vcfs retain original name but the concatenated lookup key will be a text file specified by output')
 parser.add_argument('-mi', type = int, metavar = 'minimum amount individuals', required = True, help = 'minimum amount of individuals required to support alternative alleles')
-parser.add_argument('-mp', type = int, metavar = 'min. proportion alt alleles', required = True, help = 'minimum proportion of alternative alleles to allow')
+parser.add_argument('-mp', type = float, metavar = 'min. proportion alt alleles', required = True, help = 'minimum proportion of alternative alleles to allow')
 parser.add_argument('-nm', type = int, metavar = 'number_missing_alleles', required = True, help = 'amount of missing data (integer corresponding to # of alleles) to allow')
 parser.add_argument('-ly', type = str, metavar = 'lyrata_only?', required = False, default = 'false', help = 'do you want to include lyrata only (true) or not (false)?')
 
@@ -26,14 +26,18 @@ if args.gz == 'true' and args.v[-3:] == '.gz':
     lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 # I need help below
    # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
-else:
-    lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
-# is the above line necessary, or is that redundant due to line 38 opening args.v as 'vcf' ?
+
+lookup_table_file = open(args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
+
+
+if args.ly == 'true':  # PJM: if we are only using lyrata, then we need to make sure that args.mi = 2, since there are only two lyrata samples.
+    args.mi = 2
+    args.mp = 1.0
+
+count = 0
 
 with open(args.v) as vcf:
     for line_idx, line in enumerate(vcf): #Cycle over lines in the VCF file
-        # Do I need the below line, or is it redundant?
-        # newVCF = open(args.v + '/repolarization_lookup/'+vcf[:-3]+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".vcf", 'w')  
         cols = line.replace('\n', '').split('\t')  #Split each line of vcf
         if len(cols) < 2:               ## This should be info just before header
             pass
@@ -41,11 +45,6 @@ with open(args.v) as vcf:
             
             # for i in range(len(cols)):
             #     print(i,cols[i])         # printing the header name & its index position. Won't keep in final code; just to help build it
-            
-            # Help- I'm overthinking this; should I do lookup_table_file.write or one of the next two options?
-            lookup_table_file.write(line)
-            # vcf.write(line)
-            # newVCF.write(line)
             
             names = [] #list to append pop names to (may not be necessary..)
             for j in cols[9:]: #get names of individuals in vcf
@@ -66,25 +65,25 @@ with open(args.v) as vcf:
             min_ind = args.mi
             min_prop_alt = args.mp
 
-            for ind in cols[9:]:
+            for j, ind in enumerate(cols[9:]):
                 ind = ind.split(":")
                 dp = ind[2]  # Help- this now prints out dp (correct; I compared to vcf) but breaks after a while and says 'listindex out of range'
-                print dp
+                print dp  # for debugging purposes you should put the print statements before the above two lines.  For example, if dp = ind[2] is breaking then you want to print ind before the call of dp = ind[2].  This will show you what ind is just prior to the error being thrown.
                 print ind
                 gt = ind[0]
                 gt = gt.split("/")
 
 # below is the 'Lyrata Only' section.
-
+                # PJM: Your code below does not currently distinguish lyrata from the other samples.  You can use enumerate to do this as follows:
+                # PJM: If you look at the samples in the VCF, you should see that the first two samples are Croatica corresponding to j = 0 and j = 1
+                # PJM: Lyrata are the third and fourth samples and these will correspond to j = 2 and j = 3.
                 if args.ly == 'true':
-                    for j in enumerate(names):
+                    if j == 2 or j == 3:
                         if gt[0] != ".":
                             num_ind += 1
                             if sum([int(x) for x in gt]) == 2:
                                 alt_ind += 1
-                                if gt == '1/1':
-                                    print 'blah2'
-                                else:
+
 
                                 #add code to save the info/write to file
 # above section needs work; need to think more.
