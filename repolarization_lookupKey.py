@@ -24,7 +24,7 @@ args = parser.parse_args()
 if args.gz == 'true' and args.v[-3:] == '.gz':
     gzip.gunzip(args.v)
 
-# PATRICK: I need help below
+# I need help below
    # elif args.gz == 'false' and args.v[-3:] == 'vcf':   
 lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 # is the above line necessary, or is that redundant due to line 38 opening args.v as 'vcf' ?
@@ -46,7 +46,7 @@ with open(args.v) as vcf:
             # for i in range(len(cols)):
             #     print(i,cols[i])         # printing the header name & its index position. Won't keep in final code; just to help build it
             
-            # PATRICK: I'm overthinking this; should I do lookup_table_file.write or one of the next two options?
+            # Help- I'm overthinking this; should I do lookup_table_file.write or one of the next two options?
             lookup_table_file.write(line)
             # vcf.write(line)
             # newVCF.write(line)
@@ -72,13 +72,13 @@ with open(args.v) as vcf:
 
             for ind in cols[9:]:
                 ind = ind.split(":")
-                dp = ind[2]  # PATRICK: I stopped debugging for the day bc I can't figure this out: it says line 76 is 'ListIndex out of range' even though the input vcf has this index.
+                dp = ind[2]  # Help- this now prints out dp (correct; I compared to vcf) but breaks after a while and says 'listindex out of range'
                 print dp
+                print ind
                 gt = ind[0]
                 gt = gt.split("/")
 
 # below is the 'Lyrata Only' section.
-# start here tomorrow: I need to think more about this part
 
                 if args.ly == 'true':
                     if gt[0] != ".":
@@ -87,8 +87,8 @@ with open(args.v) as vcf:
                             alt_ind += 1
                             if gt == '1/1':
                                 print 'blah2'
-                                #save the info/write to file
-# above section needs work; start here tomorrow. think more.
+                                #add code to save the info/write to file
+# above section needs work; need to think more.
 
                 elif args.ly != 'true':
                     if gt[0] != ".":
@@ -99,4 +99,4 @@ with open(args.v) as vcf:
             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
                 #out.write(scaff + "\t" + str(position) + "\n")
                 lookup_table_file.write(scaff + "\t" + str(position) + "\n")
-                # PATRICK: is above line correct, or should it be vcf.write(.....)
+                # Help- is above line correct, or should it be vcf.write(.....)
