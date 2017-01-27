@@ -13,7 +13,6 @@ parser.add_argument('-gz', type = str, metavar = 'gzipped?', required = False, d
 parser.add_argument('-o', type = str, metavar = 'Output_Prefix', required = True, help = 'Vcfs retain original name but the concatenated lookup key will be a text file specified by output')
 parser.add_argument('-mi', type = int, metavar = 'minimum amount individuals', required = True, help = 'minimum amount of individuals required to support alternative alleles')
 parser.add_argument('-mp', type = float, metavar = 'min. proportion alt alleles', required = True, help = 'minimum proportion of alternative alleles to allow')
-parser.add_argument('-nm', type = int, metavar = 'number_missing_alleles', required = True, help = 'amount of missing data (integer corresponding to # of alleles) to allow')
 parser.add_argument('-ly', type = str, metavar = 'lyrata_only?', required = False, default = 'false', help = 'do you want to include lyrata only (true) or not (false)?')
 
 args = parser.parse_args()
@@ -64,33 +63,27 @@ with open(args.v) as vcf:
 
             for j, ind in enumerate(cols[9:]):
                 ind = ind.split(":")
-                #print ind
                 #if ind[2] == True: # this line was me trying to be hacky. 
-                try:                  
+                if len(ind) ==5:             
                     dp = ind[2]  # breaks after a while and says 'listindex out of range'
-                except IndexError:
-                    pass    # this little block overcomes the listindex error, but is it leaving out something important? 
+                    gt = ind[0]
+                    gt = gt.split("/")
 
-                #print dp  
+                    # below is the 'Lyrata Only' section.
+                    if args.ly == 'true':
+                        if j == 2 or j == 3:
+                            if gt[0] != ".":
+                                num_ind += 1
+                                if sum([int(x) for x in gt]) == 2:
+                                    alt_ind += 1
 
-                gt = ind[0]
-                gt = gt.split("/")
-
-# below is the 'Lyrata Only' section.
-                if args.ly == 'true':
-                    if j == 2 or j == 3:
+                    elif args.ly != 'true':
                         if gt[0] != ".":
                             num_ind += 1
                             if sum([int(x) for x in gt]) == 2:
                                 alt_ind += 1
 
-                elif args.ly != 'true':
-                    if gt[0] != ".":
-                        num_ind += 1
-                        if sum([int(x) for x in gt]) == 2:
-                            alt_ind += 1
-
             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
 #original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
-                lookup_table_file.write(scaff + "HI" + "\t" + str(position) + str(ind) + "\n") # JMK Help: I can't seem to alter what's written to the file
+                lookup_table_file.write(scaff + "\t" + str(position) + "\n") # JMK Help: I can't seem to alter what's written to the file
 
