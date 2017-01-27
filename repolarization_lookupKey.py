@@ -24,13 +24,15 @@ if args.gz == 'true' and args.v[-3:] == '.gz':
     gzip.gunzip(args.v)
     lookup_table_file = open(args.v+args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
 
-lookup_table_file = open(args.o+"repolarized.lookupKey.minAlleles_"+str(args.mi)+".txt", 'w')
+lookup_table_file = open(args.o+"repolarized.lookupKey.minInd_"+str(args.mi)+".txt", 'w')
 
 if args.ly == 'true':  
     args.mi = 2 # args.mi must = 2, since there are only two lyrata samples
     args.mp = 1.0
 
 count = 0
+
+count_file = open(args.o + "counts.txt",'w')
 
 with open(args.v) as vcf:
     for line_idx, line in enumerate(vcf): # Cycle over lines in the VCF file
@@ -58,6 +60,7 @@ with open(args.v) as vcf:
             newsite=[]
             num_ind = 0
             alt_ind = 0
+            het_ind = 0
             min_ind = args.mi
             min_prop_alt = args.mp
 
@@ -76,12 +79,18 @@ with open(args.v) as vcf:
                                 num_ind += 1
                                 if sum([int(x) for x in gt]) == 2:
                                     alt_ind += 1
+                                elif sum([int(x) for x in gt]) == 1:
+                                    het_ind += 1
 
                     elif args.ly != 'true':
                         if gt[0] != ".":
                             num_ind += 1
                             if sum([int(x) for x in gt]) == 2:
                                 alt_ind += 1
+                            elif sum([int(x) for x in gt]) == 1:
+                                    het_ind += 1
+
+            count_file.write(str(num_ind) + "\t" + str(alt_ind) + "\t" + str(het_ind) + "\n")
 
             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
 #original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
