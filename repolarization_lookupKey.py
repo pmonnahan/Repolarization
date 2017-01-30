@@ -5,7 +5,8 @@
 
 #loop over /Repolarization/ vcf 
 
-import os, sys, subprocess, argparse, random, numpy, csv, gzip
+import argparse
+import gzip
 
 parser = argparse.ArgumentParser(description = 'This program takes a merged vcf with highest-coverage individuals from specific pops as input, and outputs a lookup key from the merged vcf')
 parser.add_argument('-v', type = str, metavar = 'vcf_path', required = True, help = 'path to vcf')
