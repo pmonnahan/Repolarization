@@ -64,6 +64,12 @@ with open(args.v) as vcf:
             het_ind = 0
             min_ind = args.mi
             min_prop_alt = args.mp
+            cros = 0
+            hals = 0
+            lyrs = 0
+            cro_alt_alleles = 0
+            lyr_alt_alleles = 0
+            hal_alt_alleles = 0
 
             for j, ind in enumerate(cols[9:]):
                 ind = ind.split(":")
@@ -83,15 +89,39 @@ with open(args.v) as vcf:
                                 elif sum([int(x) for x in gt]) == 1:
                                     het_ind += 1
 
-                    elif args.ly != 'true':
-                        if gt[0] != ".":
-                            num_ind += 1
-                            if sum([int(x) for x in gt]) == 2:
-                                alt_ind += 1
-                            elif sum([int(x) for x in gt]) == 1:
-                                    het_ind += 1
 
-            count_file.write(str(num_ind) + "\t" + str(alt_ind) + "\t" + str(het_ind) + "\n")
+                    elif args.ly != 'true':
+                        if j == 0 or j == 1:  # Croatica
+                            if gt[0] != ".":
+                                num_ind += 1
+                                cros += 1
+                                if sum([int(x) for x in gt]) == 2:
+                                    alt_ind += 1
+                                    cro_alt_alleles += 2
+                                elif sum([int(x) for x in gt]) == 1:
+                                    het_ind += 1
+                                    cro_alt_alleles += 1
+                        if j == 2 or j == 3:  # lyrata
+                            if gt[0] != ".":
+                                num_ind += 1
+                                lyrs += 1
+                                if sum([int(x) for x in gt]) == 2:
+                                    alt_ind += 1
+                                    lyr_alt_alleles += 2
+                                elif sum([int(x) for x in gt]) == 1:
+                                    het_ind += 1
+                                    lyr_alt_alleles += 1
+                        if j == 4 or j == 5:  # halleri
+                            if gt[0] != ".":
+                                num_ind += 1
+                                hals += 1
+                                if sum([int(x) for x in gt]) == 2:
+                                    alt_ind += 1
+                                    hal_alt_alleles += 2
+                                elif sum([int(x) for x in gt]) == 1:
+                                    het_ind += 1
+                                    hal_alt_alleles += 1
+            count_file.write(str(num_ind) + "\t" + str(alt_ind) + "\t" + str(het_ind) + "\t" + str(cro_alt_alleles) + "\t" + str(lyr_alt_alleles) + "\t" + str(hal_alt_alleles) + "\t" + "\n")
 
             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
 #original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
