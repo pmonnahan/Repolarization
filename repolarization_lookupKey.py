@@ -32,7 +32,7 @@ if args.ly == 'true':
     args.mp = 1.0
 
 count = 0
-
+type_counts = [0, 0, 0, 0]
 count_file = open(args.o + "counts.txt",'w')
 
 with open(args.v) as vcf:
@@ -70,6 +70,7 @@ with open(args.v) as vcf:
             cro_alt_alleles = 0
             lyr_alt_alleles = 0
             hal_alt_alleles = 0
+            species = 0
 
             for j, ind in enumerate(cols[9:]):
                 ind = ind.split(":")
@@ -94,7 +95,7 @@ with open(args.v) as vcf:
                         if j == 0 or j == 1:  # Croatica
                             if gt[0] != ".":
                                 num_ind += 1
-                                cros += 1
+                                cros += 2
                                 if sum([int(x) for x in gt]) == 2:
                                     alt_ind += 1
                                     cro_alt_alleles += 2
@@ -104,7 +105,7 @@ with open(args.v) as vcf:
                         if j == 2 or j == 3:  # lyrata
                             if gt[0] != ".":
                                 num_ind += 1
-                                lyrs += 1
+                                lyrs += 2
                                 if sum([int(x) for x in gt]) == 2:
                                     alt_ind += 1
                                     lyr_alt_alleles += 2
@@ -114,16 +115,42 @@ with open(args.v) as vcf:
                         if j == 4 or j == 5:  # halleri
                             if gt[0] != ".":
                                 num_ind += 1
-                                hals += 1
+                                hals += 2
                                 if sum([int(x) for x in gt]) == 2:
                                     alt_ind += 1
                                     hal_alt_alleles += 2
                                 elif sum([int(x) for x in gt]) == 1:
                                     het_ind += 1
                                     hal_alt_alleles += 1
-            count_file.write(str(num_ind) + "\t" + str(alt_ind) + "\t" + str(het_ind) + "\t" + str(cro_alt_alleles) + "\t" + str(lyr_alt_alleles) + "\t" + str(hal_alt_alleles) + "\t" + "\n")
 
-            if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
-#original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
-                lookup_table_file.write(scaff + "\t" + str(position) + "\n") # JMK Help: I can't seem to alter what's written to the file
+
+            if all(k >= 2 for k in [cros, lyrs, hals]):  # 3 species genotyped for at least one indivdiual
+                spec_freqs = [float(l) / float(m) for l, m in zip([cro_alt_alleles, lyr_alt_alleles, hal_alt_alleles], [cros, lyrs, hals])]
+                if sum([1 for jj in spec_freqs if jj > 0.5]) >= 2:
+                    lookup_table_file.write(scaff + "\t" + str(position) + "\n")
+                    type_counts[0] += 1
+            elif all(k >= 2 for k in [cros, lyrs]):  # Genotypes for cro and lyr
+                spec_freqs = [float(l) / float(m) for l, m in zip([cro_alt_alleles, lyr_alt_alleles, lyr_alt_alleles], [cros, lyrs, lyrs])]
+                if sum(spec_freqs) / 3.0 > 0.5:
+                    lookup_table_file.write(scaff + "\t" + str(position) + "\n")
+                    type_counts[1] += 1
+            elif all(k >= 2 for k in [cros, hals]):  # Genotypes for cro and hal
+                spec_freqs = [float(l) / float(m) for l, m in zip([cro_alt_alleles, hal_alt_alleles, hal_alt_alleles], [cros, hals, hals])]
+                if sum(spec_freqs) / 3.0 > 0.5:
+                    lookup_table_file.write(scaff + "\t" + str(position) + "\n")
+                    type_counts[2] += 1
+            elif all(k >= 2 for k in [lyrs, hals]):  # Genotypes for lyr and hal
+                spec_freqs = [float(l) / float(m) for l, m in zip([lyr_alt_alleles, hal_alt_alleles, hal_alt_alleles], [lyrs, hals, hals])]
+                if sum(spec_freqs) / 3.0 > 0.5:
+                    lookup_table_file.write(scaff + "\t" + str(position) + "\n")
+                    type_counts[3] += 1
+    print(type_counts)
+
+
+            # if float(cro_alt_alleles) / float(cros) > 0.5 
+            # count_file.write(str(num_ind) + "\t" + str(alt_ind) + "\t" + str(het_ind) + "\t" + str(cro_alt_alleles) + "\t" + str(lyr_alt_alleles) + "\t" + str(hal_alt_alleles) + "\t" + "\n")
+
+#             if num_ind >= min_ind and float(alt_ind)/float(num_ind) >= min_prop_alt:
+# #original line: lookup_table_file.write(scaff + "\t" + str(position) + "\n")                
+#                 lookup_table_file.write(scaff + "\t" + str(position) + "\n") # JMK Help: I can't seem to alter what's written to the file
 
